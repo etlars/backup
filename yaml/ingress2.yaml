@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress2
+
+spec:
+  rules:
+   - host: dell.demo.vmware.com
+     http:
+#  - http:
+      paths:
+      - path: /user2/
+        backend:
+          serviceName: test-svc-user
+          servicePort: 80
+      - path: /product2/
+        backend:
+          serviceName: test-svc-product
+          servicePort: 80
+

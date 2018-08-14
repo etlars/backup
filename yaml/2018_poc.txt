@@ -1,0 +1,8 @@
+NAME                READY     STATUS    RESTARTS   AGE
+pod/test-rs-26hpk   1/1       Running   0          1h
+pod/test-rs-2mnjx   1/1       Running   0          1h
+pod/test-rs-85nbz   1/1       Running   0          1h
+pod/test-rs-fmrj6   1/1       Running   0          1h
+NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
+service/kubernetes   ClusterIP      10.96.0.1      <none>         443/TCP        9d
+service/test-svc     LoadBalancer   10.99.127.48   10.35.107.10   80:31575/TCP   1h

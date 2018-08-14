@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-svc100
+spec:
+  selector:
+    type: web100
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer  
+
