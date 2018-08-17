@@ -1,6 +1,103 @@
 
 
+root@k001:~# kubectl run web --image=nginx --labels app=web --expose --port 80
+service "web" created
+deployment "web" created
+root@k001:~# kubectl get svc -o wide
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE       SELECTOR
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        171d      <none>
+web          ClusterIP   10.101.124.109   <none>        80/TCP         6s        app=web
+root@k001:~# kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- http://web
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
 
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # wget -qO- http://web.default
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # wget -qO- http://10.101.124.109
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # nslookup web
+nslookup: can't resolve '(null)': Name does not resolve
+
+Name:      web
+Address 1: 10.101.124.109 web.default.svc.cluster.local
+/ # nslookup web.default
+nslookup: can't resolve '(null)': Name does not resolve
+
+Name:      web.default
+Address 1: 10.101.124.109 web.default.svc.cluster.local
+/ #
 
 root@k001:~# kubectl get po -n kube-system
 NAME                                    READY     STATUS    RESTARTS   AGE
