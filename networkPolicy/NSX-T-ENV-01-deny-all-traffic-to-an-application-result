@@ -59,3 +59,59 @@ nslookup: can't resolve '(null)': Name does not resolve
 
 nslookup: can't resolve 'web.default.svc.cluster.local': Try again
 / #
+
+
+[root@master1 backup]# kubectl logs -n kube-system kube-dns-86f4d74b45-dzwbp -c  kubedns
+I0817 09:29:12.101737       1 dns.go:48] version: 1.14.8
+I0817 09:29:12.102524       1 server.go:71] Using configuration read from directory: /kube-dns-config with period 10s
+I0817 09:29:12.102572       1 server.go:119] FLAG: --alsologtostderr="false"
+I0817 09:29:12.102582       1 server.go:119] FLAG: --config-dir="/kube-dns-config"
+I0817 09:29:12.102587       1 server.go:119] FLAG: --config-map=""
+I0817 09:29:12.102591       1 server.go:119] FLAG: --config-map-namespace="kube-system"
+I0817 09:29:12.102595       1 server.go:119] FLAG: --config-period="10s"
+I0817 09:29:12.102603       1 server.go:119] FLAG: --dns-bind-address="0.0.0.0"
+I0817 09:29:12.102606       1 server.go:119] FLAG: --dns-port="10053"
+I0817 09:29:12.102612       1 server.go:119] FLAG: --domain="cluster.local."
+I0817 09:29:12.102619       1 server.go:119] FLAG: --federations=""
+I0817 09:29:12.102624       1 server.go:119] FLAG: --healthz-port="8081"
+I0817 09:29:12.102629       1 server.go:119] FLAG: --initial-sync-timeout="1m0s"
+I0817 09:29:12.102635       1 server.go:119] FLAG: --kube-master-url=""
+I0817 09:29:12.102650       1 server.go:119] FLAG: --kubecfg-file=""
+I0817 09:29:12.102653       1 server.go:119] FLAG: --log-backtrace-at=":0"
+I0817 09:29:12.102659       1 server.go:119] FLAG: --log-dir=""
+I0817 09:29:12.102663       1 server.go:119] FLAG: --log-flush-frequency="5s"
+I0817 09:29:12.102669       1 server.go:119] FLAG: --logtostderr="true"
+I0817 09:29:12.102672       1 server.go:119] FLAG: --nameservers=""
+I0817 09:29:12.102675       1 server.go:119] FLAG: --stderrthreshold="2"
+I0817 09:29:12.102680       1 server.go:119] FLAG: --v="2"
+I0817 09:29:12.102684       1 server.go:119] FLAG: --version="false"
+I0817 09:29:12.102692       1 server.go:119] FLAG: --vmodule=""
+I0817 09:29:12.102732       1 server.go:201] Starting SkyDNS server (0.0.0.0:10053)
+I0817 09:29:12.102919       1 server.go:220] Skydns metrics enabled (/metrics:10055)
+I0817 09:29:12.102931       1 dns.go:146] Starting endpointsController
+I0817 09:29:12.102937       1 dns.go:149] Starting serviceController
+I0817 09:29:12.103164       1 logs.go:41] skydns: ready for queries on cluster.local. for tcp://0.0.0.0:10053 [rcache 0]
+I0817 09:29:12.103179       1 logs.go:41] skydns: ready for queries on cluster.local. for udp://0.0.0.0:10053 [rcache 0]
+I0817 09:29:12.603146       1 dns.go:170] Initialized services and endpoints from apiserver
+I0817 09:29:12.603164       1 server.go:135] Setting up Healthz Handler (/readiness)
+I0817 09:29:12.603175       1 server.go:140] Setting up cache handler (/cache)
+I0817 09:29:12.603180       1 server.go:126] Status HTTP port 8081
+[root@master1 backup]#
+[root@master1 backup]# kubectl logs -n kube-system kube-dns-86f4d74b45-dzwbp -c  dnsmasq
+I0817 09:29:43.092838       1 main.go:76] opts: {{/usr/sbin/dnsmasq [-k --cache-size=1000 --no-negcache --log-facility=- --server=/cluster.local/127.0.0.1#10053 --server=/in-addr.arpa/127.0.0.1#10053 --server=/ip6.arpa/127.0.0.1#10053] true} /etc/k8s/dns/dnsmasq-nanny 10000000000}
+I0817 09:29:43.092975       1 nanny.go:94] Starting dnsmasq [-k --cache-size=1000 --no-negcache --log-facility=- --server=/cluster.local/127.0.0.1#10053 --server=/in-addr.arpa/127.0.0.1#10053 --server=/ip6.arpa/127.0.0.1#10053]
+I0817 09:29:43.114977       1 nanny.go:119]
+W0817 09:29:43.115000       1 nanny.go:120] Got EOF from stdout
+I0817 09:29:43.115018       1 nanny.go:116] dnsmasq[9]: started, version 2.78 cachesize 1000
+I0817 09:29:43.115025       1 nanny.go:116] dnsmasq[9]: compile time options: IPv6 GNU-getopt no-DBus no-i18n no-IDN DHCP DHCPv6 no-Lua TFTP no-conntrack ipset auth no-DNSSEC loop-detect inotify
+I0817 09:29:43.115030       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain ip6.arpa
+I0817 09:29:43.115034       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain in-addr.arpa
+I0817 09:29:43.115038       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain cluster.local
+I0817 09:29:43.115340       1 nanny.go:116] dnsmasq[9]: reading /etc/resolv.conf
+I0817 09:29:43.115348       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain ip6.arpa
+I0817 09:29:43.115352       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain in-addr.arpa
+I0817 09:29:43.115356       1 nanny.go:116] dnsmasq[9]: using nameserver 127.0.0.1#10053 for domain cluster.local
+I0817 09:29:43.115359       1 nanny.go:116] dnsmasq[9]: using nameserver 192.168.55.30#53
+I0817 09:29:43.115363       1 nanny.go:116] dnsmasq[9]: using nameserver 8.8.8.8#53
+I0817 09:29:43.115367       1 nanny.go:116] dnsmasq[9]: read /etc/hosts - 7 addresses
+
