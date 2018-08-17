@@ -4,6 +4,12 @@
 [root@k11 networkPolicyRecipes]# kubectl run web --image=nginx --labels app=web --expose --port 80
 service/web created
 deployment.apps/web created
+
+[root@k11 networkPolicyRecipes]# kubectl get svc -o wide
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE       SELECTOR
+web                 ClusterIP   10.102.40.137    <none>        80/TCP         13m       app=web
+
+
 [root@k11 networkPolicyRecipes]# kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
 If you don't see a command prompt, try pressing enter.
 / # wget -qO- http://web
@@ -33,3 +39,13 @@ Commercial support is available at
 </body>
 </html>
 / #
+/ # nslookup web
+nslookup: can't resolve '(null)': Name does not resolve
+
+Name:      web
+Address 1: 10.102.40.137 web.default.svc.cluster.local
+/ # nslookup web.default
+nslookup: can't resolve '(null)': Name does not resolve
+
+Name:      web.default
+Address 1: 10.102.40.137 web.default.svc.cluster.local
