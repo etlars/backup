@@ -1,0 +1,52 @@
+[root@master1 10]#  kubectl run db --image=redis:4 --port 6379 --expose \
+>         --labels app=bookstore,role=db
+service "db" created
+deployment.apps "db" created
+[root@master1 10]# cat redis-allow-services.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: redis-allow-services
+spec:
+  podSelector:
+    matchLabels:
+      app: bookstore
+      role: db
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: bookstore
+          role: search
+    - podSelector:
+            matchLabels:
+              app: bookstore
+              role: api
+    - podSelector:
+            matchLabels:
+              app: inventory
+              role: web
+
+[root@master1 10]# kubectl apply -f redis-allow-services.yaml
+networkpolicy.networking.k8s.io "redis-allow-services" created
+[root@master1 10]# k get po,deploy,svc -o wide
+NAME                      READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/db-555d7844f4-xkn8n   1/1       Running   0          1m        172.30.0.3   worker1
+
+NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
+deployment.extensions/db   1         1         1            1           1m        db           redis:4   app=bookstore,role=db
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE       SELECTOR
+service/db           ClusterIP   10.110.102.206   <none>        6379/TCP   1m        app=bookstore,role=db
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP    17d       <none>
+[root@master1 10]# kubectl run test-$RANDOM --labels=app=inventory,role=web --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # nc -v -w 2 172.30.0.3 6379
+172.30.0.3 (172.30.0.3:6379) open
+/ # exit
+Session ended, resume using 'kubectl attach test-4357-8d7bc54d4-5xkf4 -c test-4357 -i -t' command when the pod is running
+[root@master1 10]# kubectl run test-$RANDOM --labels=app=other --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  nc -v -w 2 172.30.0.3 6379
+172.30.0.3 (172.30.0.3:6379) open
+

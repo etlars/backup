@@ -1,0 +1,55 @@
+[root@master1 09]# kubectl run apiserver --image=ahmet/app-on-two-ports --labels=app=apiserver
+deployment.apps "apiserver" created
+[root@master1 09]#  kubectl create service clusterip apiserver \
+>         --tcp 8001:8000 \
+>         --tcp 5001:5000
+service "apiserver" created
+[root@master1 09]# k get po,deploy,svc -o wide
+NAME                             READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/apiserver-998fc8dbb-cmbvh    1/1       Running   0          30s       172.30.0.2   worker1
+pod/test-2658-746f78bc75-7bn5x   1/1       Running   2          6m        172.30.0.4   worker1
+
+NAME                              DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES                   SELECTOR
+deployment.extensions/apiserver   1         1         1            1           30s       apiserver    ahmet/app-on-two-ports   app=apiserver
+deployment.extensions/test-2658   1         1         1            1           6m        test-2658    alpine                   role=monitoring
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE       SELECTOR
+service/apiserver    ClusterIP   10.102.165.245   <none>        8001/TCP,5001/TCP   24s       app=apiserver
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP             17d       <none>
+[root@master1 09]# cat api-allow-5000.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: api-allow-5000
+spec:
+  podSelector:
+    matchLabels:
+      app: apiserver
+  ingress:
+  - ports:
+    - port: 5000
+    from:
+    - podSelector:
+        matchLabels:
+          role: monitoring
+
+[root@master1 09]# kubectl apply -f api-allow-5000.yaml
+networkpolicy.networking.k8s.io "api-allow-5000" created
+[root@master1 09]#  kubectl run test-2658-746f78bc75-7bn5x  --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.0.2:8000
+wget: download timed out
+/ #  wget -qO- --timeout=2 http://172.30.0.2:5000/metrics
+wget: download timed out
+/ # exit
+Session ended, resume using 'kubectl attach test-2658-746f78bc75-7bn5x-6cb7b8cdfb-tqpns -c test-2658-746f78bc75-7bn5x -i -t' command when the pod is running
+[root@master1 09]# kubectl run test-$RANDOM --labels=role=monitoring --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.0.2:8000
+wget: download timed out
+/ #  wget -qO- --timeout=2 http://172.30.0.2:5000/metrics
+http.requests=1
+go.goroutines=5
+go.cpus=2
+/ #
+

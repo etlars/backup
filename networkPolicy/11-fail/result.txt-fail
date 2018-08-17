@@ -1,0 +1,47 @@
+
+[root@master1 11]# kubectl run web --image=nginx --port 80 --expose \
+>         --labels app=web
+service "web" created
+deployment.apps "web" created
+[root@master1 11]# kubectl get po,deploy,svc -o wide
+NAME                       READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-c5dnc   1/1       Running   0          20s       172.30.0.2   worker1
+
+NAME                        DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
+deployment.extensions/web   1         1         1            1           20s       web          nginx     app=web
+
+NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/kubernetes   ClusterIP   10.96.0.1     <none>        443/TCP   18d       <none>
+service/web          ClusterIP   10.96.175.2   <none>        80/TCP    19s       app=web
+[root@master1 11]# cat foo-deny-egress.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: foo-deny-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: foo
+  policyTypes:
+  - Egress
+  egress: []
+
+[root@master1 11]# kubectl apply -f foo-deny-egress.yaml
+networkpolicy.networking.k8s.io "foo-deny-egress" created
+[root@master1 11]# kubectl run --rm --restart=Never --image=alpine -i -t -l app=foo test -- ash
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout 1 http://web:80
+wget: bad address 'web:80'
+/ #  wget -qO- --timeout 1 http://www.example.com/
+wget: bad address 'www.example.com'
+/ # wget --timeout 1 -O- http://web
+wget: bad address 'web'
+/ # wget --timeout 1 -O- http://web:80
+wget: bad address 'web:80'
+/ # wget --timeout 1 -O- http://www.example.com
+wget: bad address 'www.example.com'
+/ # wget --timeout 1 -O- http://www.google.com
+wget: bad address 'www.google.com'
+/ # ping google.com
+ping: bad address 'google.com'
+

@@ -1,0 +1,56 @@
+[root@master1 12]# kubectl run web --image=nginx     --labels=app=web --port 80
+deployment.apps "web" created
+[root@master1 12]# k get po -o wide
+NAME                   READY     STATUS    RESTARTS   AGE       IP           NODE
+web-5bc8ccf596-vjr4h   1/1       Running   0          7s        172.30.0.2   worker1
+[root@master1 12]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # exit
+Session ended, resume using 'kubectl attach test-21774-f6fd74744-gm4bs -c test-21774 -i -t' command when the pod is running
+
+[root@master1 12]# cat default-deny-all-egress.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: default-deny-all-egress
+  namespace: default
+spec:
+  policyTypes:
+  - Egress
+  podSelector: {}
+  egress: []
+
+[root@master1 12]# kubectl apply -f default-deny-all-egress.yaml
+networkpolicy.networking.k8s.io "default-deny-all-egress" created
+[root@master1 12]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.0.2
+wget: download timed out
+/ #
+

@@ -1,0 +1,74 @@
+[root@master1 02]#  kubectl run apiserver --image=nginx --labels app=bookstore,role=api --expose --port 80
+service "apiserver" created
+deployment.apps "apiserver" created
+
+[root@master1 02]# kubectl get po,deploy,svc -o wide
+NAME                             READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/apiserver-7bb7d98c95-vj5sw   1/1       Running   0          1m        172.30.0.2   worker1
+pod/test-8769-764d5759f4-r4bxp   1/1       Running   0          41s       172.30.0.3   worker1
+
+NAME                              DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
+deployment.extensions/apiserver   1         1         1            1           1m        apiserver    nginx     app=bookstore,role=api
+deployment.extensions/test-8769   1         1         1            1           41s       test-8769    alpine    run=test-8769
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/apiserver    ClusterIP   10.100.232.14   <none>        80/TCP    1m        app=bookstore,role=api
+service/kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   17d       <none>
+
+[root@master1 02]# cat api-allow.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: api-allow
+spec:
+  podSelector:
+    matchLabels:
+      app: bookstore
+      role: api
+  ingress:
+  - from:
+      - podSelector:
+          matchLabels:
+            app: bookstore
+
+[root@master1 02]# kubectl apply -f api-allow.yaml
+networkpolicy.networking.k8s.io "api-allow" unchanged
+[root@master1 02]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+/ #  wget -qO- --timeout=2 http://172.30.0.2
+wget: download timed out
+/ # exit
+Session ended, resume using 'kubectl attach test-27237-7b76b574b4-wlhht -c test-27237 -i -t' command when the pod is running
+[root@master1 02]# k delete -f api-allow.yaml
+networkpolicy.networking.k8s.io "api-allow" deleted
+[root@master1 02]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://10.100.232.14
+wget: download timed out
+/ #  wget -qO- --timeout=2 http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # exit
+

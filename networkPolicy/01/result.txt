@@ -32,12 +32,23 @@ working. Further configuration is required.</p>
 <a href="http://nginx.org/">nginx.org</a>.<br/>
 Commercial support is available at
 <a href="http://nginx.com/">nginx.com</a>.</p>
-
 <p><em>Thank you for using nginx.</em></p>
 </body>
 </html>
 / # exit
 Session ended, resume using 'kubectl attach test-17726-b9d5f96b8-fhg5n -c test-17726 -i -t' command when the pod is running
+
+[root@master1 01]# cat ../01/web-deny-all.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: web-deny-all
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  ingress: []
+
 [root@master1 01]# kubectl apply -f web-deny-all.yaml
 networkpolicy.networking.k8s.io "web-deny-all" created
 [root@master1 01]#  kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
