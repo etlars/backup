@@ -49,3 +49,19 @@ nslookup: can't resolve '(null)': Name does not resolve
 
 Name:      web.default
 Address 1: 10.102.40.137 web.default.svc.cluster.local
+
+
+[root@k11 networkPolicyRecipes]# kubectl logs -n kube-system coredns-78fcdf6894-4l54w
+.:53
+2018/07/27 04:59:08 [INFO] CoreDNS-1.1.3
+2018/07/27 04:59:08 [INFO] linux/amd64, go1.10.1, b0fd575c
+CoreDNS-1.1.3
+linux/amd64, go1.10.1, b0fd575c
+2018/07/27 04:59:08 [INFO] plugin/reload: Running configuration MD5 = 2a066f12ec80aeb2b92740dd74c17138
+W0809 11:08:16.482752       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:313: watch of *v1.Service ended with: too old resource version: 937589 (1805759)
+W0809 11:08:16.724293       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:320: watch of *v1.Namespace ended with: too old resource version: 931750 (1805759)
+W0809 11:23:11.711001       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:313: watch of *v1.Service ended with: too old resource version: 1805759 (1807235)
+W0809 11:23:11.800839       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:320: watch of *v1.Namespace ended with: too old resource version: 1805759 (1807235)
+W0809 11:30:59.822081       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:313: watch of *v1.Service ended with: too old resource version: 1807235 (1808109)
+W0809 11:30:59.822571       1 reflector.go:341] github.com/coredns/coredns/plugin/kubernetes/controller.go:320: watch of *v1.Namespace ended with: too old resource version: 1807235 (1808109)
+[root@k11 networkPolicyRecipes]#
