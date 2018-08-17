@@ -3,20 +3,28 @@
    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
    Active: inactive (dead) since Wed 2018-08-08 13:14:17 KST; 1 weeks 2 days ago
 
-[root@master1 ~]# k get po,deploy,svc -o wide
-NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE
-pod/web-5bc8ccf596-ltxff          1/1       Running   0          18m       172.30.0.2   worker1
+[root@master1 networkPolicy]# k get netpol
+No resources found.
 
-NAME                               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
-deployment.extensions/web          1         1         1            1           18m       web          nginx     app=web
+[root@master1 01]# kubectl run web --image=nginx --labels app=web --expose --port 80
+service "web" created
+deployment.apps "web" created
+
+[root@master1 01]# kubectl get po,svc -o wide
+NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-ltxff          1/1       Running   0          1h        172.30.0.2   worker1
 
 NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE       SELECTOR
-service/web          ClusterIP   10.101.228.125   <none>        80/TCP    18m       app=web
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP   18d       <none>
+service/web          ClusterIP   10.101.228.125   <none>        80/TCP    1h        app=web
 
-[root@master1 ~]#  kubectl run --rm -it --image=alpine test-$RANDOM -- sh
-If you don't see a command prompt, try pressing enter.
-/ #  wget -qO- http://web
+[root@master1 01]# kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
+/ # wget -qO- --timeout=2 http://web
 wget: bad address 'web'
+
+/ # wget -qO- --timeout=2 http://web.default
+wget: bad address 'web.default'
+
 / #
 / # wget -qO- --timeout=2 http://10.101.228.125
 wget: download timed out
@@ -46,19 +54,6 @@ Commercial support is available at
 <p><em>Thank you for using nginx.</em></p>
 </body>
 </html>
-/ # nslookup web
-nslookup: can't resolve '(null)': Name does not resolve
-
-nslookup: can't resolve 'web': Try again
-/ # nslookup web.default
-nslookup: can't resolve '(null)': Name does not resolve
-
-nslookup: can't resolve 'web.default': Try again
-/ # nslookup web.default.svc.cluster.local
-nslookup: can't resolve '(null)': Name does not resolve
-
-nslookup: can't resolve 'web.default.svc.cluster.local': Try again
-/ #
 
 
 [root@master1 backup]# kubectl logs -n kube-system kube-dns-86f4d74b45-dzwbp -c  kubedns
