@@ -1,0 +1,48 @@
+[root@master1 01]# kubectl run web --image=nginx --labels app=web --expose --port 80
+service "web" created
+deployment.apps "web" created
+[root@master1 01]# kubectl get po,svc -o wide
+NAME                       READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-lv5cp   1/1       Running   0          12s       172.30.0.2   worker1
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   17d       <none>
+service/web          ClusterIP   10.105.177.47   <none>        80/TCP    12s       app=web
+[root@master1 01]#  kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # exit
+Session ended, resume using 'kubectl attach test-17726-b9d5f96b8-fhg5n -c test-17726 -i -t' command when the pod is running
+[root@master1 01]# kubectl apply -f web-deny-all.yaml
+networkpolicy.networking.k8s.io "web-deny-all" created
+[root@master1 01]#  kubectl run --rm -i -t --image=alpine test-$RANDOM -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://172.30.0.2
+wget: download timed out
+/ #
+
