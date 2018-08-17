@@ -1,0 +1,61 @@
+[root@master1 ~]# systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: inactive (dead) since Wed 2018-08-08 13:14:17 KST; 1 weeks 2 days ago
+
+[root@master1 ~]# k get po,deploy,svc -o wide
+NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-ltxff          1/1       Running   0          18m       172.30.0.2   worker1
+
+NAME                               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
+deployment.extensions/web          1         1         1            1           18m       web          nginx     app=web
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/web          ClusterIP   10.101.228.125   <none>        80/TCP    18m       app=web
+
+[root@master1 ~]#  kubectl run --rm -it --image=alpine test-$RANDOM -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- http://web
+wget: bad address 'web'
+/ #
+/ # wget -qO- --timeout=2 http://10.101.228.125
+wget: download timed out
+/ # wget -qO- --timeout=2 http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # nslookup web
+nslookup: can't resolve '(null)': Name does not resolve
+
+nslookup: can't resolve 'web': Try again
+/ # nslookup web.default
+nslookup: can't resolve '(null)': Name does not resolve
+
+nslookup: can't resolve 'web.default': Try again
+/ # nslookup web.default.svc.cluster.local
+nslookup: can't resolve '(null)': Name does not resolve
+
+nslookup: can't resolve 'web.default.svc.cluster.local': Try again
+/ #
