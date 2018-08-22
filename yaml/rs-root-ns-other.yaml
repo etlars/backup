@@ -1,21 +1,22 @@
 apiVersion: apps/v1beta2
 kind: ReplicaSet
 metadata:
-  name: test-rs-user
+  name: test-rs-root
+  namespace: other
   labels:
-    type: web
+    type: web0-other
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      type: web
+      type: web0-other
   template:
     metadata:
       labels:
-        type: web
+        type: web0-other
     spec:
       containers:
-      - name: test-container-user
-        image: etlars/node_user:v2
+      - name: test-container0-other
+        image: etlars/nodejs_server:v2
         ports:
         - containerPort: 8080
