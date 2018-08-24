@@ -1,0 +1,20 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: ubuntu-test1
+  namespace: test1
+  labels:
+    type: u1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: u1
+  template:
+    metadata:
+      labels:
+        type: u1
+    spec:
+      containers:
+      - name: test-ubuntu1
+        image: tutum/ubuntu:trusty
