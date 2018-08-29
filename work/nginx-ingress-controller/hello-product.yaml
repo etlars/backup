@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: hello-product-rs
+  namespace: ingress-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-product
+  template:
+    metadata:
+      labels:
+        app: hello-product
+    spec:
+      containers:
+      - image: etlars/node_product:v2
+        name: hello-product
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-product-svc
+  namespace: ingress-nginx
+spec:
+  selector:
+    app: hello-product
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  #type: LoadBalancer
+  type: NodePort

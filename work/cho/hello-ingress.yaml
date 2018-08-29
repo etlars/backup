@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-ingress
+spec:
+  rules:
+  - host: k11
+    http:
+      paths:
+      - path: /users/*
+        backend:
+          serviceName: hello-user-svc
+          servicePort: 80
+      - path: /products/*
+        backend:
+          serviceName: hello-product-svc
+          servicePort: 80

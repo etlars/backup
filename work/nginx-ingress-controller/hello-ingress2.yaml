@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+  name: hello-ingress2
+  namespace: ingress-nginx
+spec:
+  tls:
+  - hosts:
+    - "k12"
+    secretName: tls-secret2
+  rules:
+  - host: k12
+    http:
+      paths:
+      - path: /user
+        backend:
+          serviceName: hello-user-svc
+          servicePort: 80
+      - path: /product
+        backend:
+          serviceName: hello-product-svc
+          servicePort: 80

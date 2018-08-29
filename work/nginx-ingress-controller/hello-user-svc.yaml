@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-user-svc
+  namespace: ingress-nginx
+spec:
+  selector:
+    app: hello-user
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  #type: LoadBalancer
+  type: NodePort

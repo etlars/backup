@@ -1,0 +1,19 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: hello-product-rs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-product
+  template:
+    metadata:
+      labels:
+        app: hello-product
+    spec:
+      containers:
+      - image: etlars/node_product:v2
+        name: hello-product
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-svc-app-multiport
+spec:
+  selector:
+    type: app12
+  ports:
+  - name: primary
+    port: 91
+    targetPort: 8081
+  - name: secondary
+    port: 92
+    targetPort: 8082
+  type: LoadBalancer  
+ # type: NodePort
+

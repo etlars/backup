@@ -1,0 +1,22 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: hi-user-deployment
+  labels:
+    app: hi-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hi-user
+  template:
+    metadata:
+      labels:
+        app: hi-user
+    spec:
+      containers:
+      - name: hi-user
+        image: etlars/node_user:v1
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
