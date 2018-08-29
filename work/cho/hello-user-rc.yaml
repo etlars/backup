@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: hello-user-rc
+spec:
+  replicas: 2
+  selector:
+    app: hello-user
+  template:
+    metadata:
+      name: hello-user-pod
+      labels:
+        app: hello-user
+    spec:
+      containers:
+      - name: hello-user
+        image: etlars/node_user:v2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080

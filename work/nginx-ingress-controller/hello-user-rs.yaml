@@ -1,0 +1,20 @@
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: hello-user-rs
+  namespace: ingress-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-user
+  template:
+    metadata:
+      labels:
+        app: hello-user
+    spec:
+      containers:
+      - image: etlars/node_user:v2
+        name: hello-user
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,22 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: hi-node-deployment
+  labels:
+    app: hi-product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hi-product
+  template:
+    metadata:
+      labels:
+        app: hi-product
+    spec:
+      containers:
+      - name: hi-product
+        image: etlars/node_product:v1
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
