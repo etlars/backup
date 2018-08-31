@@ -99,3 +99,13 @@ PING google.com (108.177.125.139): 56 data bytes
 9 packets transmitted, 0 packets received, 100% packet loss
 / # ping -c3 google.com
 PING google.com (172.217.31.174): 56 data bytes       <--- dns resolved~!
+
+
+
+root@k001:~/backup/networkPolicy/11-fail# k delete deploy web
+deployment "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete svc web
+service "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete networkpol foo-deny-egress
+the server doesn't have a resource type "networkpol"
+root@k001:~/backup/networkPolicy/11-fail#
