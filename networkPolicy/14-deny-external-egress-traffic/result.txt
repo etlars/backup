@@ -1,3 +1,6 @@
+[root@master1 14-deny-external-egress-traffic]# kubectl run web --image=nginx --port 80 --expose --labels app=web
+service "web" created
+
 [root@master1 14-deny-external-egress-traffic]# kubectl run --rm --restart=Never --image=alpine -it -l app=foo test -- ash
 If you don't see a command prompt, try pressing enter.
 / # wget -O- --timeout=2 http://web
