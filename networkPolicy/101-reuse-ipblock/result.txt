@@ -1,0 +1,52 @@
+[root@master1 101-reuse-ipblock]# kubectl run web --image=nginx --namespace ns1 --labels=app=api --expose --port 80
+
+
+[root@master1 yaml]# k get all -o wide
+NAME                        READY     STATUS    RESTARTS   AGE       IP            NODE
+pod/ubuntu                  1/1       Running   0          13d       172.30.0.4    worker1
+
+ot@master1 yaml]# k get all -n ns2 -o wide
+NAME                   READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/ubuntu-ns2-cl585   1/1       Running   0          35s       172.30.7.2   worker1
+
+
+
+[root@master1 101-reuse-ipblock]# k exec -it ubuntu -- wget -qO- --timeout=2 http://web.ns1
+<!DOCTYPE html><html><head><title>Welcome to nginx!</title>
+
+[root@master1 101-reuse-ipblock]# k exec -it ubuntu-ns2-cl585 -n ns2  -- wget -qO- --timeout=2 http://web.ns1
+<!DOCTYPE html><html><head><title>Welcome to nginx!</title>
+...
+
+[root@master1 101-reuse-ipblock]# k apply -f ipblock.yaml
+networkpolicy.networking.k8s.io "test-network-policy" created
+...
+
+[root@master1 101-reuse-ipblock]# k exec -it ubuntu --  wget -qO- --timeout=2 http://web.ns1
+<!DOCTYPE html><html><head><title>Welcome to nginx!</title>
+...
+
+[root@master1 101-reuse-ipblock]# k exec -it ubuntu-ns2-cl585 -n ns2 --  wget -qO- --timeout=2 http://web.ns1
+^Ccommand terminated with exit code 130
+
+[root@master1 101-reuse-ipblock]# k delete ns ns2
+namespace "ns2" deleted
+[root@master1 101-reuse-ipblock]# k create ns ns3
+namespace "ns3" created
+
+[root@master1 yaml]# k get all -n ns3 -o wide
+NAME                   READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/ubuntu-ns3-9b6x7   1/1       Running   0          13s       172.30.4.2   worker1
+[root@master1 yaml]# k delete ns ns3
+namespace "ns3" deleted
+
+[root@master1 yaml]# k get all -n ns5  -o wide
+NAME                   READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/ubuntu-ns5-gcgq6   1/1       Running   0          13s       172.30.7.2   worker1
+
+
+[root@master1 101-reuse-ipblock]# k exec -it ubuntu-ns5-gcgq6 -n ns5 -- wget -qO- --timeout=2 http://web.ns1
+^Ccommand terminated with exit code 130
+[root@master1 101-reuse-ipblock]#
+
+
