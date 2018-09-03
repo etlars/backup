@@ -24,7 +24,7 @@ data:
 
     # The log file path must be set to something like '/var/log/nsx-ujo/'. By
     # default, logging to file is disabled.
-    #log_dir = /var/log/nsx-ujo/
+    #log_dir = None
 
     # Name of log file to send logging output to. If log_dir is set but log_file is
     # not, the binary name will be used, i.e., ncp.log, nsx_node_agent.log and
@@ -245,7 +245,7 @@ data:
 
     # Name or UUID of the tier0 router that project tier1 routers connect to
     tier0_router = T0-Router01
-    #tier0_router = b3ba3029-f4b3-4679-9bf7-6c5e8e89c8e6
+    # tier0_router = b3ba3029-f4b3-4679-9bf7-6c5e8e89c8e6
 
     # Name or UUID of the NSX overlay transport zone that will be used for creating
     # logical switches for container networking. It must refer to an existing
@@ -255,6 +255,7 @@ data:
 
     # Name or UUID of the NSX lb service that can be attached by virtual servers
     #lb_service = <None>
+    lb_service = k8s-master-api-LB02 
 
     # Name or UUID of the container ip blocks that will be used for creating
     # subnets. If name, it must be unique
@@ -334,13 +335,8 @@ spec:
             mountPath: /etc/nsx-ujo/ncp.ini
             subPath: ncp.ini
             readOnly: true
-          - name: nsx-log-dir
-            mountPath: /var/log/nsx-ujo/
       volumes:
         - name: config-volume
           # ConfigMap nsx-ncp-config is expected to supply ncp.ini
           configMap:
             name: nsx-ncp-config
-        - name: nsx-log-dir
-          hostPath:
-            path: /var/log/nsx-ujo/
