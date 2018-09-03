@@ -10,7 +10,7 @@ spec:
   - Egress
   egress:
   - ports:
-    - port: 22
+    - port: 81
       protocol: TCP
   - to:
     - namespaceSelector: {}
