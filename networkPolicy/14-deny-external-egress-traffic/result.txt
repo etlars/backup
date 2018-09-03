@@ -1,0 +1,122 @@
+[root@master1 14-deny-external-egress-traffic]# kubectl run --rm --restart=Never --image=alpine -it -l app=foo test -- ash
+If you don't see a command prompt, try pressing enter.
+/ # wget -O- --timeout=2 http://web
+Connecting to web (10.111.251.84:80)
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |*********************************************************************************************************************************************************|   612   0:00:00 ETA
+/ #
+/ #
+/ # wget -O- --timeout=2 http://www.google.com
+wget: bad address 'www.google.com'
+/ # wget -O- --timeout=2 http://www.daum.net
+wget: bad address 'www.daum.net'
+/ #
+/ #
+/ #
+/ #
+/ #
+/ # exit
+pod default/test terminated (Error)
+[root@master1 14-deny-external-egress-traffic]# cat result.txt
+[root@master1 14-deny-external-egress-traffic]#
+[root@master1 14-deny-external-egress-traffic]#
+[root@master1 14-deny-external-egress-traffic]#
+[root@master1 14-deny-external-egress-traffic]# ll
+total 8
+-rw-r--r--.  1 root root  283 Aug 17 16:12 foo-deny-egress-except-dns.yaml
+-rw-r--r--.  1 root root    0 Aug 31 16:59 result.txt
+drwxr-xr-x. 16 root root 4096 Sep  3 16:36 ..
+drwxr-xr-x.  2 root root   63 Sep  3 16:42 .
+[root@master1 14-deny-external-egress-traffic]# kubectl run --rm --restart=Never --image=alpine -it -l app=foo test -- ash
+
+
+
+
+
+
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+/ #
+/ #
+/ #
+/ #
+/ #
+/ #
+/ #
+/ #
+/ #
+/ #
+/ # wget -O- --timeout=2 http://web
+Connecting to web (10.111.251.84:80)
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |*********************************************************************************************************************************************************|   612   0:00:00 ETA
+/ # wget -O- --timeout=2 http://ftp.kaist.ac.kr
+wget: bad address 'ftp.kaist.ac.kr'
+/ #
+/ #
+/ #
+/ # exit
+kpod default/test terminated (Error)
+[root@master1 14-deny-external-egress-traffic]# kubectl apply -f foo-deny-egress-except-dns.yaml
+networkpolicy.networking.k8s.io "foo-deny-egress" created
+[root@master1 14-deny-external-egress-traffic]# kubectl run --rm --restart=Never --image=alpine -it -l app=foo test -- ash
+If you don't see a command prompt, try pressing enter.
+/ #  wget -O- --timeout=2 http://web
+Connecting to web (10.111.251.84:80)
+wget: download timed out
+/ # wget -O- --timeout=2 http://ftp.kaist.ac.kr
+wget: bad address 'ftp.kaist.ac.kr'
+/ # exit
+pod default/test terminated (Error)
+
