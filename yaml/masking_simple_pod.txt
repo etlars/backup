@@ -1,0 +1,13 @@
+
+# delete manually by commands
+kubectl run web --image=nginx --port 80 --expose   --labels app=web
+
+# delete automatically just after run
+kubectl run --rm --restart=Never --image=alpine -i -t -l app=foo test -- ash
+
+/ # wget -qO- --timeout 1 http://web:80/
+
+
+# deleting deploy,svc web
+kubectl delete deployment,service web
+

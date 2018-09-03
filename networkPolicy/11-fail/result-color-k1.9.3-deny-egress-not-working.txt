@@ -1,0 +1,111 @@
+root@k001:~/backup/networkPolicy/11-fail# kubectl run web --image=nginx --port 80 --expose \
+>     --labels app=web
+service "web" created
+deployment "web" created
+root@k001:~/backup/networkPolicy/11-fail# k apply -f foo-deny-egress.yaml
+networkpolicy "foo-deny-egress" created
+root@k001:~/backup/networkPolicy/11-fail# kubectl run --rm --restart=Never --image=alpine -i -t -l app=foo test -- ash
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=1 http://web:80/
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # wget -qO- --timeout=1 http://www.example.com
+wget: download timed out
+/ # ping -c3 google.com
+PING google.com (172.217.31.174): 56 data bytes  <-- dns resolved~!! networkpolicy is not working~!
+
+root@k001:~/backup/networkPolicy/11-fail# k delete deploy web
+deployment "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete svc web
+service "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete networkpol foo-deny-egress
+the server doesn't have a resource type "networkpol"
+root@k001:~/backup/networkPolicy/11-fail#
+
+root@k001:~/backup/networkPolicy/11-fail# k describe netpol foo-deny-egress
+Name:         foo-deny-egress
+Namespace:    default
+Created on:   2018-08-31 15:48:30 +0900 KST
+Labels:       <none>
+Annotations:  kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"foo-deny-egress","namespace":"default"},"spec":{"egres...
+Spec:
+  PodSelector:     app=foo
+  Allowing ingress traffic:
+    <none> (Selected pods are isolated for ingress connectivity)
+  Allowing egress traffic:
+    To Port: 53/UDP
+    To Port: 53/TCP
+    To: <any> (traffic not restricted by source)
+  Policy Types: Egress
+
+
+
+
+/ # wget -qO- --timeout=1 http://web
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # wget -qO- --timeout=1 http://www.example.com
+wget: download timed out
+/ # ping google.com
+PING google.com (108.177.125.139): 56 data bytes
+^C
+--- google.com ping statistics ---
+9 packets transmitted, 0 packets received, 100% packet loss
+/ # ping -c3 google.com
+PING google.com (172.217.31.174): 56 data bytes       <--- dns resolved~!
+
+
+
+root@k001:~/backup/networkPolicy/11-fail# k delete deploy web
+deployment "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete svc web
+service "web" deleted
+root@k001:~/backup/networkPolicy/11-fail# k delete networkpol foo-deny-egress
+the server doesn't have a resource type "networkpol"
+root@k001:~/backup/networkPolicy/11-fail#
