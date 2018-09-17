@@ -12,8 +12,8 @@ import ssl
 import urllib.request
 
 username = 'admin'
-password = 'default'
-nsxManager = '10.161.2.73'
+password = 'VMware1!'
+nsxManager = '192.168.55.37'
 
 def nsxSetup(username, password):
    '''Setups up Python's urllib library to communicate with the
@@ -46,10 +46,12 @@ def nsxGetBundle(host, authorizationField):
       bundleLocation is the URL of the full location of the bundle
       bundleName is the file name (last component) of the bundle location
    '''
+   print ("-----debug----1")
    request = urllib.request.Request(
                 'https://%s/api/1.0/appliance-management/techsupportlogs/NSX' % host,
                 method='POST',
                 headers={'Authorization': authorizationField})
+   print ("-----debug----2")
    response = urllib.request.urlopen(request)
 
    # The first REST hit returns the location in the 'Location' field in the
