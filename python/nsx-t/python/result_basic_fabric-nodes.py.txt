@@ -1,0 +1,17 @@
+(venv) [root@api-test basics]# python fabric-nodes.py
+Type: HostNode, Name: comp-esxi01, id: 5c48751a-1efb-4ddd-aab8-2febb39abf43
+    mp conn: UP, cp conn: UP
+Type: HostNode, Name: comp-esxi02, id: c79c603c-285e-42d2-bd82-f6fe618549eb
+    mp conn: UP, cp conn: UP
+Type: HostNode, Name: comp-esxi03, id: c06e59d1-1186-422a-8c9a-c5e65da2aa78
+    mp conn: UP, cp conn: UP
+Type: HostNode, Name: comp-esxi04, id: 97d1478c-f82d-4c56-9a59-47ef848a17f2
+    mp conn: UP, cp conn: UP
+Type: EdgeNode, Name: nsx-edge01, id: c5de30d8-8984-11e8-9e1a-005056a7e699
+    mp conn: UP, cp conn: UP
+Type: EdgeNode, Name: nsx-edge02, id: 930f8a12-8984-11e8-8718-005056a77850
+    mp conn: UP, cp conn: UP
+Type: EdgeNode, Name: nsx-edge03, id: 10c8004c-9c5e-11e8-a7fd-005056a738fa
+    mp conn: UP, cp conn: UP
+Type: EdgeNode, Name: nsx-edge04, id: adb43226-b49c-11e8-a229-005056a74876
+    mp conn: UP, cp conn: UP

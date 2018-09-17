@@ -1,0 +1,20 @@
+(venv) [root@api-test basics]# python l3-demo.py
+At this point you may attach VMs for the db tier to the db
+logical switch and VMs for the web tier to the web logical
+switch. The network interfaces should be configured as
+follows:
+db tier:
+    IP address: in the range 192.168.1.2-254
+    Netmask: 255.255.255.0
+    Default route: 192.168.1.1
+web tier:
+    IP address: in the range 192.168.2.2-254
+    Netmask: 255.255.255.0
+    Default route: 192.168.2.1
+Logical switch IDs:
+    ls-db: 74dde68d-a01d-4471-a40f-12240cf72765
+    ls-web: 7d1ebbec-a1e9-49c8-9244-9d66f6cd6be2
+Transport zone: Two Tier App Demo Transport Zone: 95b29e56-b1de-4f07-ba9f-5bd25ccc9f94
+Press enter to delete all resources created for this example.
+
+
