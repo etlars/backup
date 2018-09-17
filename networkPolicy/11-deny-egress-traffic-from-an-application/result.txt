@@ -1,0 +1,51 @@
+[root@master1 11-fail]# k run web --image=nginx --port 80 --expose --labels app=web
+service "web" created
+deployment.apps "web" created
+[root@master1 11-fail]# k run --rm --restart=Never --image=alpine -it -l app=foo test -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -O- --timeout=2 http://web
+Connecting to web (10.111.2.197:80)
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |*********************************************************************************************************************************************************|   612   0:00:00 ETA
+/ #
+/ #
+/ # # after apply foo-deny-egress.yaml
+
+
+[root@master1 11-fail]# k apply -f foo-deny-egress.yaml
+networkpolicy.networking.k8s.io "foo-deny-egress" created
+[root@master1 11-fail]#
+
+
+
+/ #
+/ # wget -O- --timeout=2 http://web
+wget: bad address 'web'
+/ # wget -O- --timeout=2 http://www.google.com
+wget: bad address 'www.google.com'
+/ #
+

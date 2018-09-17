@@ -1,0 +1,45 @@
+[root@master1 ~]# ssh worker1
+Last login: Mon Aug 27 11:04:15 2018 from 192.168.255.202
+[root@worker1 ~]# ovs-ofctl dump-flows br-int
+ cookie=0x7, duration=1015231.480s, table=0, n_packets=8477510, n_bytes=1674851425, priority=100,ip actions=ct(table=1)
+ cookie=0x7, duration=1015231.505s, table=0, n_packets=160485, n_bytes=13021136, priority=0 actions=NORMAL
+ cookie=0x7, duration=1015231.417s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-trk,ip actions=ct(table=1)
+ cookie=0x7, duration=1015231.390s, table=1, n_packets=1106209, n_bytes=78394346, priority=100,ct_state=+new+trk,tcp,nw_dst=10.96.0.1,tp_dst=443 actions=group:1
+ cookie=0x7, duration=1015231.340s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=+new+trk,tcp,nw_dst=10.100.190.241,tp_dst=80 actions=group:4
+ cookie=0x7, duration=572.609s, table=1, n_packets=301, n_bytes=28131, priority=100,ct_state=+new+trk,udp,nw_dst=10.96.0.10,tp_dst=53 actions=group:14
+ cookie=0x7, duration=572.602s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=+new+trk,tcp,nw_dst=10.96.0.10,tp_dst=53 actions=group:15
+ cookie=0x7, duration=571.444s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=+new+trk,tcp,nw_dst=10.102.236.59,tp_dst=80 actions=group:6
+ cookie=0x7, duration=1015231.384s, table=1, n_packets=1793, n_bytes=106002, priority=100,ct_state=-new+trk,ip,nw_dst=10.96.0.1 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=1015231.332s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.100.190.241 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=1015231.313s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.108.133.91 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960114.172s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.96.0.10 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960114.120s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.111.157.210 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960114.069s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.107.86.210 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960114.001s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.102.236.59 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960113.948s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.104.132.137 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=960113.887s, table=1, n_packets=0, n_bytes=0, priority=100,ct_state=-new+trk,ip,nw_dst=10.106.201.90 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=1015231.319s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.108.133.91 actions=group:5
+ cookie=0x7, duration=960114.140s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.111.157.210 actions=group:7
+ cookie=0x7, duration=960114.085s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.107.86.210 actions=group:8
+ cookie=0x7, duration=960114.020s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.102.236.59 actions=group:9
+ cookie=0x7, duration=960113.965s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.104.132.137 actions=group:10
+ cookie=0x7, duration=960113.904s, table=1, n_packets=0, n_bytes=0, priority=100,ip,nw_dst=10.106.201.90 actions=group:11
+ cookie=0x7, duration=1015231.409s, table=1, n_packets=4321643, n_bytes=865116357, priority=90,ip,in_port=ens256 actions=ct(table=2,zone=65312,nat)
+ cookie=0x7, duration=1015231.403s, table=1, n_packets=3047565, n_bytes=731206655, priority=80,ip actions=NORMAL
+ cookie=0x7, duration=1015231.471s, table=2, n_packets=5429945, n_bytes=943644770, actions=NORMAL
+[root@worker1 ~]# ovs-ofctl dump-groups -O OpenFlow13 br-int
+OFPST_GROUP_DESC reply (OF1.3) (xid=0x2):
+ group_id=1,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=10.35.107.1:6443))
+ group_id=2,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.1.2:53))
+ group_id=3,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.1.2:53))
+ group_id=7,type=select
+ group_id=8,type=select
+ group_id=11,type=select
+ group_id=14,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.1.3:53))
+ group_id=5,type=select
+ group_id=9,type=select
+ group_id=4,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.0.3:8080)),bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.0.2:8080))
+ group_id=6,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.0.6:8080)),bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.0.5:8080))
+ group_id=10,type=select
+ group_id=15,type=select,bucket=weight:100,actions=ct(commit,table=2,zone=65312,nat(dst=172.30.1.3:53))
+

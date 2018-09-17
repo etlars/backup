@@ -1,0 +1,67 @@
+root@master1 04]# kubectl create namespace secondary
+namespace "secondary" created
+[root@master1 04]# kubectl run web --namespace secondary --image=nginx \
+>     --labels=app=web --expose --port 80
+service "web" created
+deployment.apps "web" created
+[root@master1 04]# cat deny-from-other-namespaces.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: secondary
+  name: deny-from-other-namespaces
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - podSelector: {}
+
+
+root@master1 04]# kubectl get po,deploy,svc -o wide -n secondary
+NAME                       READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-97xbd   1/1       Running   0          3m        172.30.8.2   worker1
+
+NAME                        DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINERS   IMAGES    SELECTOR
+deployment.extensions/web   1         1         1            1           3m        web          nginx     app=web
+
+NAME          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/web   ClusterIP   10.109.68.90   <none>        80/TCP    3m        app=web
+
+
+[root@master1 04]# kubectl apply -f deny-from-other-namespaces.yaml
+networkpolicy.networking.k8s.io "deny-from-other-namespaces" created
+[root@master1 04]# kubectl run test-$RANDOM --namespace=default --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.8.2
+wget: download timed out
+/ # exit
+[root@master1 04]#  kubectl run test-$RANDOM --namespace=secondary --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.8.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # 

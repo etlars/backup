@@ -1,0 +1,66 @@
+[root@master1 06]#  kubectl run web --image=nginx \
+>         --labels=app=web --expose --port 80
+service "web" created
+deployment.apps "web" created
+[root@master1 06]# k get po -o wide
+NAME                       READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/web-5bc8ccf596-266bf   1/1       Running   0          10s       172.30.0.2   worker1
+[root@master1 06]# kubectl create namespace dev
+namespace "dev" created
+[root@master1 06]# kubectl label namespace/dev purpose=testing
+namespace "dev" labeled
+[root@master1 06]# kubectl create namespace prod
+namespace "prod" created
+[root@master1 06]# kubectl label namespace/prod purpose=production
+namespace "prod" labeled
+
+[root@master1 06]# cat web-allow-prod.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: web-allow-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: production
+[root@master1 06]# kubectl apply -f web-allow-prod.yaml
+networkpolicy.networking.k8s.io "web-allow-prod" created
+[root@master1 06]# kubectl run test-$RANDOM --namespace=dev --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://172.30.0.2
+wget: download timed out
+/ # exit
+[root@master1 06]# kubectl run test-$RANDOM --namespace=prod --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # 

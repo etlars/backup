@@ -1,0 +1,57 @@
+[root@master1 10]#  kubectl run db --image=redis:4 --port 6379 --expose \
+>         --labels app=bookstore,role=db
+service "db" created
+deployment.apps "db" created
+[root@master1 10]# cat redis-allow-services.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: redis-allow-services
+spec:
+  podSelector:
+    matchLabels:
+      app: bookstore
+      role: db
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: bookstore
+          role: search
+    - podSelector:
+            matchLabels:
+              app: bookstore
+              role: api
+    - podSelector:
+            matchLabels:
+              app: inventory
+              role: web
+
+[root@master1 11-fail]# kubectl run db --image=redis:4 --port 6379 --expose --labels app=bookstore,role=db
+service "db" created
+deployment.apps "db" created
+[root@master1 10-fail]# kubectl apply -f redis-allow-services.yaml
+networkpolicy.networking.k8s.io "redis-allow-services" created
+[root@master1 10-fail]# kubectl run test-$RANDOM --labels=app=other --rm -it --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # nc -v -w 2 db 6379
+db (10.98.76.14:6379) open
+/ # exit
+Session ended, resume using 'kubectl attach test-16234-cc774d765-rx6cp -c test-16234 -i -t' command when the pod is running
+
+[root@master1 10-fail]# kubectl run test-$RANDOM --labels=app=inventory,role=web --rm -it --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # nc -v -w 2 db 6379
+db (10.98.76.14:6379) open
+/ # exit
+Session ended, resume using 'kubectl attach test-29092-7d5db7598c-czpkx -c test-29092 -i -t' command when the pod is running
+
+[root@master1 10-fail]# kubectl apply -f redis-allow-services.yaml
+networkpolicy.networking.k8s.io "redis-allow-services" unchanged
+
+[root@master1 10-fail]# kubectl run test-$RANDOM --labels=app=other --rm -it --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # nc -v -w 2 db 6379
+db (10.98.76.14:6379) open
+/ #
+

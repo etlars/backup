@@ -5,7 +5,7 @@ metadata:
   labels:
     type: app12
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       type: app12

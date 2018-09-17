@@ -1,0 +1,130 @@
+[root@k11 networkPolicyRecipes]# k run web --image=nginx --labels=app=web --expose --port 80
+service/web created
+deployment.apps/web created
+[root@k11 networkPolicyRecipes]# k create ns dev
+namespace/dev created
+[root@k11 networkPolicyRecipes]# k label ns/dev purpose=testing
+namespace/dev labeled
+[root@k11 networkPolicyRecipes]# k create ns prod
+namespace/prod created
+[root@k11 networkPolicyRecipes]# vi 06-web-all-prod.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: web-allow-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          purpose: production
+
+[root@k11 networkPolicyRecipes]# k run test-$RANDOM --namespace=dev --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://web.default
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ #
+/ #
+/ # # apply networkpolicy
+/ # # [root@k11 networkPolicyRecipes]# k apply -f 06-web-all-prod.yaml
+/ # # networkpolicy.networking.k8s.io/web-allow-prod created
+/ #
+/ #
+/ # wget -qO- --timeout=2 http://web.default
+wget: download timed out
+/ #
+/ #
+/ # exit
+Session ended, resume using 'kubectl attach test-14925-558699c667-rf4qw -c test-14925 -i -t' command when the pod is running
+deployment.apps "test-14925" deleted
+[root@k11 networkPolicyRecipes]# k run test-$RANDOM --namespace=prod --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://web.default
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ #
+
+
+[root@k11 networkPolicyRecipes]# k create ns staging
+namespace/staging created
+[root@k11 networkPolicyRecipes]# k label ns/staging purpose=production
+namespace/staging labeled
+[root@k11 networkPolicyRecipes]# k run test-$RANDOM --namespace=staging --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://web.default
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ #

@@ -1,0 +1,44 @@
+
+[root@master1 02-limit-traffic-to-an-application]#  kubectl run apiserver --image=nginx --labels app=bookstore,role=api --expose --port 80
+service "apiserver" created
+deployment.apps "apiserver" created
+[root@master1 02-limit-traffic-to-an-application]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ # wget -qO- --timeout=2 http://apiserver
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ # exit
+Session ended, resume using 'kubectl attach test-24095-6869b967fb-z87wf -c test-24095 -i -t' command when the pod is running
+k [root@master1 02-limit-traffic-to-an-application]# k apply -f
+api-allow.yaml   result.txt       .result.txt.swp
+[root@master1 02-limit-traffic-to-an-application]# k apply -f api-allow.yaml
+networkpolicy.networking.k8s.io "api-allow" created
+[root@master1 02-limit-traffic-to-an-application]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://apiserver
+wget: download timed out
+/ #
+

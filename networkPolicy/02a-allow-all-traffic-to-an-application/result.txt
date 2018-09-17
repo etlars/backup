@@ -1,0 +1,44 @@
+[root@master1 02a]# kubectl run web --image=nginx \
+>         --labels=app=web --expose --port 80
+service "web" created
+deployment.apps "web" created
+[root@master1 02]# kubectl get po,svc -o wide
+NAME                              READY     STATUS    RESTARTS   AGE       IP           NODE
+pod/test-10559-749c84cf84-pchmp   1/1       Running   0          28s       172.30.0.3   worker1
+pod/web-5bc8ccf596-tsg8j          1/1       Running   0          1m        172.30.0.2   worker1
+
+NAME                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE       SELECTOR
+service/kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   17d       <none>
+service/web          ClusterIP   10.108.50.165   <none>        80/TCP    1m        app=web
+
+[root@master1 02a]# kubectl apply -f web-allow-all.yaml
+networkpolicy.networking.k8s.io "web-allow-all" created
+[root@master1 02a]# kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+If you don't see a command prompt, try pressing enter.
+/ #  wget -qO- --timeout=2 http://172.30.0.2
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+/ #
