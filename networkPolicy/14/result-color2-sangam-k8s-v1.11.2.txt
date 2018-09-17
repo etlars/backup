@@ -1,0 +1,51 @@
+
+
+
+
+
+
+/ #
+/ #
+/ # wget -O- --timeout 1 http://web:80
+wget: bad address 'web:80'
+/ # ping googl.com
+ping: bad address 'googl.com'
+/ # ping google.com
+ping: bad address 'google.com'
+/ # ping kaist.ac.kr
+ping: bad address 'kaist.ac.kr'
+/ # ping kaist.ac.kr
+ping: bad address 'kaist.ac.kr'
+/ #
+/ #
+/ #
+/ #
+/ # ping google.com
+ping: bad address 'google.com'
+/ # wget -O- --timeout 1 http://web:80
+Connecting to web:80 (10.98.191.102:80)
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
