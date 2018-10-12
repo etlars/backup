@@ -1,3 +1,7 @@
+(venv) [root@api-test python]# which python
+/root/venv/bin/python
+(venv) [root@api-test python]# env | grep PYTHON
+PYTHONPATH=/root/python
 (venv) [root@api-test basics]# python l3-demo.py
 At this point you may attach VMs for the db tier to the db
 logical switch and VMs for the web tier to the web logical
