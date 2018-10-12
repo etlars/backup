@@ -1,3 +1,7 @@
+(venv) [root@api-test python]# which python
+/root/venv/bin/python
+(venv) [root@api-test python]# env | grep PYTHON
+PYTHONPATH=/root/python
 (venv) [root@api-test basics]# python fabric-nodes.py
 Type: HostNode, Name: comp-esxi01, id: 5c48751a-1efb-4ddd-aab8-2febb39abf43
     mp conn: UP, cp conn: UP
