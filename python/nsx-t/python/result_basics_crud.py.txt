@@ -1,4 +1,7 @@
-
+(venv) [root@api-test python]# which python
+/root/venv/bin/python
+(venv) [root@api-test python]# env | grep PYTHON
+PYTHONPATH=/root/python
 (venv) [root@api-test python]# python basics/crud.py
 ----debug-----1
 Initial list of transport zones - 4 zones
